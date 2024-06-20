@@ -134,8 +134,10 @@
         if (localStorage.getItem('theme') === ('dark')) {
             document.body.classList.add('dark-theme');
         }
+         /*----Api-----*/
         const apiUsers = 'https://665de13de88051d60408b1b3.mockapi.io/task/users';
         const apiIncomes = 'https://665de13de88051d60408b1b3.mockapi.io/task/incomes';
+         /*----Fetch Api-----*/
         document.addEventListener("DOMContentLoaded", function () {
             Promise.all([
                 fetch('/common/header.html').then(response => response.text()),
