@@ -1,0 +1,23 @@
+[
+    {
+        "id": 1,
+        "drink": "Coffee",
+        "caffeinated": true,
+        "price": 2.5,
+        "profit": 1.0
+    },
+    {
+        "id": 2,
+        "drink": "Tea",
+        "caffeinated": true,
+        "price": 1.5,
+        "profit": 0.8
+    },
+    {
+        "id": 3,
+        "drink": "Juice",
+        "caffeinated": false,
+        "price": 3.0,
+        "profit": 1.2
+    }
+]

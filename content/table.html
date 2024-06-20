@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern</title>
+    <link rel="stylesheet" href="/content/style.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <header class="header" id="header">
+            <!--Header-->
+        </header>
+        <div class="container" id="container">
+            <div class="sidebar" id="sidebar">
+                <!--Sidebar-->
+            </div>
+            <div class="main-content">
+                <div class="main-content-header">
+                    <h1>Datables</h1>
+                    <div class="search-container">
+                        <input id="search-input" placeholder="Search...">
+                        <button><img src="/icon/find.png" alt="findsomething"></button>
+                        <div id="search-suggestions" class="search-suggestions">
+                            <ul id="suggestions-list"></ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="search-result"></div>
+                <table id="userTable" style="display: block;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>City</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+                <div id="pagination" class="pagination"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function toggleMenu() {
+            const sidebarHide = document.getElementById('container');
+            sidebarHide.classList.toggle('sidebar-hidden');
+        }
+        document.addEventListener('DOMContentLoaded', function () {
+            if (localStorage.getItem('theme') === ('dark')) {
+                document.body.classList.add('dark-theme');
+            }
+            const apiUrl = 'https://jsonplaceholder.typicode.com/users';
+
+
+            Promise.all([
+                fetch('/common/header.html').then(response => response.text()),
+                fetch('/common/sidebar.html').then(response => response.text()),
+                fetch(apiUrl).then(response => response.json())
+            ]).then(([headerData, sidebarData, data]) => {
+                allData = data;
+
+                document.getElementById('header').innerHTML = headerData;
+
+                document.getElementById('toggle-menu').onclick = toggleMenu;
+                document.getElementById('sidebar').innerHTML = sidebarData;
+
+                // Dropdown menu user
+                const dropdownIcon = document.getElementById('dropdown');
+                dropdownIcon.addEventListener("click", function () {
+                    var dropdownCotainer = document.getElementById("dropdown-container");
+                    if (dropdownCotainer.style.display === 'none') {
+                        dropdownCotainer.style.display = 'block'
+                    } else {
+                        dropdownCotainer.style.display = 'none';
+                    }
+                })
+                document.addEventListener('click', function (event) {
+                    var isClickInside = document.querySelector('.info').contains(event.target);
+                    if (!isClickInside) {
+                        document.getElementById('dropdown-container').style.display = 'none';
+                    }
+                });
+
+                // Toggle theme dark
+                const toggleButton = document.getElementById('theme-toggle');
+                toggleButton.addEventListener('click', function () {
+                    var element = document.body;
+                    element.classList.toggle('dark-theme');
+                    if (element.classList.contains('dark-theme')) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.removeItem('theme');
+                    }
+                })
+
+                // Logout
+                var logoutElement = document.getElementById('logout');
+                if (logoutElement) {
+                    logoutElement.addEventListener('click', function () {
+                        localStorage.removeItem('username');
+                        window.location.href = "/form/signin.html";
+                    })
+                }
+
+                // Pagination
+                const rowPerPage = 5;
+                let currentPage = 1;
+                const tableBody = document.getElementById('userTable').getElementsByTagName("tbody")[0];
+                const totalPage = Math.ceil(data.length / rowPerPage);
+                function displayDataPage(page) {
+                    tableBody.innerHTML = '';
+                    const startIndex = (page - 1) * rowPerPage;
+                    const endIndex = startIndex + rowPerPage;
+                    const pageData = data.slice(startIndex, endIndex);
+
+                    pageData.forEach(item => {
+                        const row = tableBody.insertRow();
+                        const cellId = row.insertCell(0);
+                        const cellName = row.insertCell(1);
+                        const cellEmail = row.insertCell(2);
+                        const cellAddress = row.insertCell(3);
+                        const cellPhone = row.insertCell(4);
+
+                        cellId.textContent = item.id;
+                        cellName.textContent = item.name;
+                        cellEmail.textContent = item.email;
+                        cellAddress.textContent = item.address.city;
+                        cellPhone.textContent = item.phone;
+                    });
+                }
+                function renderPagination() {
+                    const paginationElement = document.getElementById('pagination');
+                    paginationElement.innerHTML = '';
+
+                    for (let i = 1; i <= totalPage; i++) {
+                        const pageLink = document.createElement('a');
+                        pageLink.href = '#';
+                        pageLink.textContent = i;
+                        if (i === currentPage) {
+                            pageLink.classList.add('active');
+                        }
+                        pageNext(pageLink, i);
+                        paginationElement.appendChild(pageLink);
+                    }
+                }
+                function pageNext(pageLink, pageNumber) {
+                    pageLink.addEventListener("click", function (event) {
+                        event.preventDefault();
+                        currentPage = pageNumber;
+                        displayDataPage(currentPage);
+                        renderPagination();
+                    });
+                }
+                displayDataPage(currentPage);
+                renderPagination();
+
+                // Check status login
+                checkLoginStatus();
+
+                // Random avatar
+                const avatarImg = document.getElementById("avatar");
+                const avatars = [
+                    "/assets/images/avatar/gamer.png",
+                    "/assets/images/avatar/hacker.png",
+                    "/assets/images/avatar/man.png",
+                    "/assets/images/avatar/woman.png"
+                ];
+                const randomAvatarIndex = Math.floor(Math.random() * avatars.length);
+                const randomAvatar = avatars[randomAvatarIndex];
+                avatarImg.src = randomAvatar;
+                localStorage.setItem('avatar', randomAvatar);
+
+                // Search suggestions
+                document.getElementById('search-suggestions').style.display = 'block'
+                const suggestions = data.flatMap(item => [
+                    item.name.toLowerCase(),
+                    item.address.city.toLowerCase()
+                ])
+                document.getElementById("search-input").addEventListener("input", function () {
+                    const input = this.value.toLowerCase();
+                    const suggestionList = document.getElementById("suggestions-list");
+                    suggestionList.innerHTML = "";
+
+                    if (input) {
+                        const filterSuggestion = suggestions.filter(item => item.includes(input));
+                        filterSuggestion.forEach(suggestion => {
+                            const li = document.createElement("li");
+                            li.textContent = suggestion;
+                            li.addEventListener("click", function () {
+                                document.getElementById("search-input").value = suggestion;
+                                suggestionList.innerHTML = "";
+                            });
+                            suggestionList.appendChild(li);
+                        });
+                    }
+                })
+            })
+            const searchInput = document.querySelector('.main-content-header input');
+            const searchButton = document.querySelector('.main-content-header button');
+            function searchTable() {
+                const searchItem = searchInput.value.trim().toLowerCase();
+                const table = document.getElementById("userTable");
+                const rows = table.getElementsByTagName("tr");
+                const resultDiv = document.getElementById('search-result');
+                let resultCount = 0;
+                if (!searchItem) {
+                    for (let i = 1; i < rows.length; i++) {
+                        rows[i].style.display = '';
+                    }
+                    resultDiv.textContent = "";
+                    return;
+                }
+                for (let i = 1; i < rows.length; i++) {
+                    const cells = rows[i].getElementsByTagName("td");
+                    let match = false;
+
+                    for (let j = 0; j < cells.length; j++) {
+                        if (cells[j].textContent.toLowerCase().indexOf(searchItem) > -1) {
+                            match = true;
+                            break;
+                        }
+                    }
+                    if (match) {
+                        rows[i].style.display = '';
+                        resultCount++;
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+                if (resultCount > 0) {
+                    resultDiv.textContent = `${resultCount} result found.`
+                } else {
+                    resultDiv.textContent = "No result found.";
+                }
+            }
+            searchButton.addEventListener('click', searchTable);
+            searchInput.addEventListener('input', function () {
+                if (searchInput.value.trim() === "") {
+                    searchTable();
+                }
+            });
+            const searchInputs = document.getElementById('search-input');
+            const searchSuggestions = document.getElementById('search-suggestions');
+            searchInputs.addEventListener('focus', () => {
+                searchSuggestions.style.display = 'block';
+            });
+            searchInputs.addEventListener('blur', () => {
+                setTimeout(() => {
+                    searchSuggestions.style.display = 'none';
+                }, 100);
+            });
+            window.addEventListener('resize', function () {
+                var inputWidth = document.querySelector('.search-container input').offsetWidth;
+                var buttonWidth = document.querySelector('.search-container button').offsetWidth;
+                var suggestionsWidth = inputWidth + buttonWidth;
+                document.querySelector('.search-suggestions').style.width = suggestionsWidth + 'px';
+            });
+        });
+
+        // Check status login
+        function checkLoginStatus() {
+            var username = localStorage.getItem('username');
+            if (username) {
+                document.getElementById("greeting").style.display = 'block';
+                document.getElementById("avatar").style.display = 'block';
+                const avatarUrl = localStorage.getItem('avatar');
+                if (avatarUrl) {
+                    const avatarImg = document.getElementById("avatar");
+                    avatarImg.src = avatarUrl;
+                }
+                document.getElementById("greeting").textContent = 'hi ' + username;
+                document.getElementById("dropdown").style.display = 'block';
+                document.getElementById("signin").style.display = 'none';
+                document.getElementById("signup").style.display = 'none';
+                document.getElementById("profile").style.display = "block";
+                document.getElementById("logout").style.display = 'block';
+            } else {
+                document.getElementById("greeting").style.display = 'none';
+                document.getElementById("signin").style.display = 'block';
+                document.getElementById("avatar").style.display = 'none';
+                document.getElementById("dropdown").style.display = 'none';
+                document.getElementById("signup").style.display = 'block';
+                document.getElementById("profile").style.display = "none";
+                document.getElementById("logout").style.display = 'none';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intern</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DCXaptKV.css">
+</head>
+
+<body>
+    <div class="wrapper">
+        <header class="header" id="header">
+            <!--Header-->
+        </header>
+        <div class="container">
+            <div class="sidebar" id="sidebar">
+                <!--Sidebar-->
+            </div>
+            <div class="body-chart">
+                <div class="small-chart">
+                    <div class="user-block">
+                        <div class="text-content">
+                            <div>
+                                <h1>26K<span class="text-normal"> (-12,4%)</span></h1>
+                            </div>
+                            <div>
+                                <p>Users</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-users"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="incomes-block">
+                        <div class="text-content">
+                            <div>
+                                <h1>$6.200<span class="text-normal"> (40.9%)</span></h1>
+                            </div>
+                            <div>
+                                <p>Incomes</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-incomes"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="conver-block">
+                        <div class="text-content">
+                            <div>
+                                <h1>2,49%<span class="text-normal"> (84.7%)</span></h1>
+                            </div>
+                            <div>
+                                <p>Conversation Rate</p>
+                            </div>
+                        </div>
+                        <div class="chart-container-converse">
+                            <canvas id="chart-converse"></canvas>
+                        </div>
+                    </div>
+                    <div class="sessions-block">
+                        <div class="text-content">
+                            <div>
+                                <h1>44K<span class="text-normal"> (-23.6%)</span></h1>
+                            </div>
+                            <div>
+                                <p>Sessions</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="chart-sessions"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        if (localStorage.getItem('theme') === ('dark')) {
+            document.body.classList.add('dark-theme');
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            Promise.all([
+                fetch('/common/header.html').then(response => response.text()),
+                fetch('/common/sidebar.html').then(response => response.text())
+            ]).then(([headerData, sidebarData]) => {
+                document.getElementById('header').innerHTML = headerData;
+                document.getElementById('sidebar').innerHTML = sidebarData;
+                // Dropdown menu user
+                const dropdownIcon = document.getElementById('dropdown');
+                dropdownIcon.addEventListener("click", function () {
+                    var dropdownCotainer = document.getElementById("dropdown-container");
+                    if (dropdownCotainer.style.display === 'none') {
+                        dropdownCotainer.style.display = 'block'
+                    } else {
+                        dropdownCotainer.style.display = 'none';
+                    }
+                })
+                document.addEventListener('click', function (event) {
+                    var isClickInside = document.querySelector('.info').contains(event.target);
+                    if (!isClickInside) {
+                        document.getElementById('dropdown-container').style.display = 'none';
+                    }
+                });
+
+                var username = localStorage.getItem('username');
+                if (username) {
+                    document.getElementById("greeting").style.display = 'block';
+                    document.getElementById("avatar").style.display = 'block';
+                    const avatarUrl = localStorage.getItem('avatar');
+                    if (avatarUrl) {
+                        const avatarImg = document.getElementById("avatar");
+                        avatarImg.src = avatarUrl;
+                    }
+                    document.getElementById("greeting").textContent = 'hi ' + username;
+                    document.getElementById("dropdown").style.display = 'block';
+                    document.getElementById("signin").style.display = 'none';
+                    document.getElementById("signup").style.display = 'none';
+                    document.getElementById("profile").style.display = "block";
+                    document.getElementById("logout").style.display = 'block';
+                } else {
+                    document.getElementById("greeting").style.display = 'none';
+                    document.getElementById("avatar").style.display = 'none';
+                    document.getElementById("dropdown").style.display = 'none';
+                    document.getElementById("signin").style.display = 'block';
+                    document.getElementById("signup").style.display = 'block';
+                    document.getElementById("profile").style.display = "none";
+                    document.getElementById("logout").style.display = 'none';
+                }
+                // Toggle theme dark
+                const toggleButton = document.getElementById('theme-toggle');
+                toggleButton.addEventListener('click', function () {
+                    var element = document.body;
+                    element.classList.toggle('dark-theme');
+                    if (element.classList.contains('dark-theme')) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.removeItem('theme');
+                    }
+                })
+                var logoutElement = document.getElementById('logout');
+                if (logoutElement) {
+                    logoutElement.addEventListener('click', function () {
+                        localStorage.removeItem('username');
+                        window.location.href = "/form/signin.html";
+                    })
+                }
+                /* -----Data users-----*/
+                const chart_users = document.getElementById('chart-users').getContext('2d');
+                const dataUser = {
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                    datasets: [{
+                        label: 'Users',
+                        data: [1, 2, 3, 4, 5, 7],
+                        borderColor: '#8d8dd8',
+                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#6360cc',
+                        pointBorderColor: '#8d8dd8',
+                        pointRadius: 5,
+                        fill: false,
+                        tension: 0.4 // This makes the line smooth
+                    }]
+                };
+                const config = {
+                    type: 'line',
+                    data: dataUser,
+                    options: {
+                        scales: {
+                            x: {
+                                display: false // Hide X-axis
+                            },
+                            y: {
+                                display: false // Hide Y-axis
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Hide legend
+                            }
+                        }
+                    }
+                };
+                const chartUsers = new Chart(chart_users, config);
+
+                /* -----Data incomes-----*/
+
+                const chart_incomes = document.getElementById('chart-incomes').getContext('2d');
+                const dataIncomes = {
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                    datasets: [{
+                        label: 'Incomes',
+                        data: [1, 2, 3, 4, 5, 7],
+                        borderColor: '#76afe3',
+                        backgroundColor: '#76afe3',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#3c99f4',
+                        pointBorderColor: '#76afe3',
+                        pointRadius: 5,
+                        fill: false,
+                        tension: 0.4
+                    }]
+                };
+                const configIncomes = {
+                    type: 'line',
+                    data: dataIncomes,
+                    options: {
+                        scales: {
+                            x: {
+                                display: false // Hide X-axis
+                            },
+                            y: {
+                                display: false // Hide Y-axis
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Hide legend
+                            }
+                        }
+                    }
+                };
+                const chartIncomes = new Chart(chart_incomes, configIncomes);
+                /* -----Data conversation-----*/
+
+                const chart_converse = document.getElementById('chart-converse').getContext('2d');
+                const dataConverse = {
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: 'Converse',
+                        data: [78, 81, 80, 45, 34, 12, 40],
+                        borderColor: '#f7dba0',
+                        backgroundColor: 'rgba(255, 255, 255, 0.4)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0, // Hide points
+                        pointHoverRadius: 5
+                    }]
+                };
+                const configConverse = {
+                    type: 'line',
+                    data: dataConverse,
+                    options: {
+                        scales: {
+                            x: {
+                                display: false // Hide X-axis
+                            },
+                            y: {
+                                display: false // Hide Y-axis
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Hide legend
+                            }
+                        },
+                        hover: {
+                            aminationDuration: 0
+                        },
+                        animation: {
+                            duration: 0
+                        }
+                        //responsiveAnimationDuration: 0 
+                    }
+                };
+                const chartConverse = new Chart(chart_converse, configConverse);
+
+                /* -----Data sessions-----*/
+
+                const chart_sessions = document.getElementById('chart-sessions').getContext('2d');
+                const dataSession = {
+                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    datasets: [{
+                        label: 'Sessions',
+                        data: [78, 81, 80, 45, 34, 12, 40],
+                        borderColor: '#e07979',
+                        backgroundColor: '#e07979',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                    }]
+                };
+                const configSessions = {
+                    type: 'bar',
+                    data: dataSession,
+                    options: {
+                        scales: {
+                            x: {
+                                display: false // Hide X-axis
+                            },
+                            y: {
+                                display: false // Hide Y-axis
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false // Hide legend
+                            }
+                        },
+                    }
+                };
+                const chartSessions = new Chart(chart_sessions, configSessions);
+            });
+        });
+
+    </script>
+</body>
+
+</html>

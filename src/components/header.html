@@ -1,0 +1,46 @@
+<!-- Header -->
+<div class="header-inner">
+    <div class="h1-btn">
+        <div>
+            <img src="/icon/demo.png" alt="demo">
+        </div>
+        <h1>
+            Demo level 1
+        </h1>
+        <button id="toggle-menu" onclick="toggleMenu()">
+            <img src="/icon/menu.png">
+        </button>
+    </div>
+    <div class="info">
+        <img id="avatar" alt="Avatar" src="">
+        <h2 id="greeting" style="display: none;">
+            hi
+        </h2>
+        <button id="dropdown">
+            <img src="/assets/images/avatar/down-arrow.png" alt="">
+        </button>
+        <ul class="dropdown-container" id="dropdown-container">
+            <li>
+                <img src="/assets/images/avatar/resume.png" alt="">
+                <a href="/content/profile.html">My profile</a>
+            </li>
+            <li>
+                <img src="/assets/images/avatar/user.png" alt="">
+                <a>Account Setting</a>
+            </li>
+            <li>
+                <img src="/assets/images/avatar/info.png" alt="">
+                <a>Help</a>
+            </li>
+        </ul>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const avatarImg = document.getElementById("avatar");
+        const savedAvatar = localStorage.getItem('avatar');
+        if (savedAvatar) {
+            avatarImg.src = savedAvatar;
+        }
+    });
+</script>

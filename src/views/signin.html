@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- displays site properly based on user's device -->
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <title>Intern</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  
+  <div class="ar-div">
+    <div>
+      <h5 class="h5">
+        Login to Your Account
+      </h5>
+      <p class="p">
+        Enter your username & password to login
+      </p>
+    </div>
+    <form id="loginForm" onsubmit="return validateForm()">
+      <div class="form-group">
+        <label>Username</label>
+        <div>
+          <input type="text" id="username">
+          <p id="usernameError" style="display: none;">Please enter your username.</p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="password">
+        <p id="passwordError" style="display: none;">Please enter your password</p>
+      </div>
+      <div class="remember-me">
+        <input type="checkbox">Remember me
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn">
+          Login
+        </button>
+      </div>
+      <div class="form-footer">
+        <p>
+          Don't have an account?
+          <a href="/form/signup.html">Create an account</a>
+        </p>
+      </div>
+    </form>
+  </div>
+  <script>
+    if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-theme');
+    }
+    function validateForm(event) {
+      event.preventDefault();
+
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+      var isValid = true;
+
+      if (username === "") {
+        document.getElementById("usernameError").style.display = "block";
+        isValid = false;
+      }
+
+      if (password === "") {
+        document.getElementById("passwordError").style.display = "block";
+        isValid = false;
+      }
+
+      if (!isValid) {
+        return false;
+      }
+
+      alert("Login successful!");
+
+      localStorage.setItem("username", username);
+
+      setTimeout(function () {
+        window.location.href = "/content/table.html";
+      }, 100);
+      return true;
+    }
+    document.getElementById("loginForm").addEventListener("submit", validateForm);
+
+    // document.addEventListener('DOMContentLoaded', function() {
+    //         history.replaceState(null, null, 'signin');
+    //         window.addEventListener('popstate', function(event) {
+    //             location.replace('index.html');
+    //         });
+    //     });
+  </script>
+</body>
+
+</html>

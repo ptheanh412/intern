@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="body">
+    <div class="ar-div">
+        <h5 class="h5">Create an Account</h5>
+        <p class="p">Enter your personal details to create account</p>
+        <form id="signupForm" onsubmit="return validate()">
+
+            <div class="form-group">
+                <label>Your name</label>
+                <input type="text" id="name">
+                <p id="nameError" style="display: none;">Please, enter your name!</p>
+            </div>
+            <div class="form-group">
+                <label>Your email</label>
+                <input type="email" id="email">
+                <p id="emailError" style="display: none;">Please enter a valid Email address!</p>
+
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username">
+                <p id="usernameError" style="display: none;">Please choose a username.</p>
+
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password">
+                <p id="passwordError" style="display: none;">Please enter your password!</p>
+            </div>
+            <div class="remember-me">
+                <input type="checkbox"> I agree and accep the terms and conditions
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn">Create Account</button>
+            </div>
+            <div class="form-footer">
+                <p>
+                    Already have an account?
+                    <a href="/form/signin.html">Log in</a>
+                </p>
+            </div>
+    </div>
+    </form>
+    <script>
+        //     document.addEventListener('DOMContentLoaded', function() {
+        //     history.replaceState(null, null, 'signup');
+        //     window.addEventListener('popstate', function(event) {
+        //         location.replace('index.html'); 
+        //     });
+        // });
+        function validate(event) {
+            event.preventDefault();
+
+            var name = document.getElementById('name').value;
+            var email = document.getElementById('email').value;
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            var nameValid = name.trim() !== "";
+            var emailValid = email.trim() !== "";
+            var usernameValid = username.trim() !== "";
+            var passwordValid = password.trim() !== "";
+
+            // Hiển thị cảnh báo cho tất cả các trường
+            document.getElementById('nameError').style.display = nameValid ? 'none' : 'block';
+            document.getElementById('emailError').style.display = emailValid ? 'none' : 'block';
+            document.getElementById('usernameError').style.display = usernameValid ? 'none' : 'block';
+            document.getElementById('passwordError').style.display = passwordValid ? 'none' : 'block';
+
+            // Nếu bất kỳ trường nào không hợp lệ, dừng validate
+            if (!nameValid || !emailValid || !usernameValid || !passwordValid) {
+                return false;
+            }
+        }
+        document.getElementById("signupForm").addEventListener("submit", validate);
+
+    </script>
+</body>
+
+</html>
